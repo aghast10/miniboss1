@@ -1,4 +1,5 @@
-tasks = [] #aquí se guardan las tareas que el usuario anote
+from archivo import saving_tasks, tasks
+
 def printed_menu():
     print ("---MENU---")
     print ("1. Ver tareas")
@@ -37,30 +38,39 @@ def see_task():
         while completed_task != "":
             try: 
                 tasks[int(completed_task)-1]["status"] = "Completada"
+                saving_tasks()
                 print("Tarea completada")
                 break
             except (ValueError,IndexError): 
-                print("seleccione una opción válida")
+                completed_task = input("seleccione una opción válida")
         print("-------")
         print("Selecciona una nueva acción")
 
 def add_task():
     new_task = input("Escribe una nueva tarea: ")
     tasks.append({"title": new_task, "status": "No Completada"}) #añade bibliotecas a la lista tasks
+    saving_tasks()
     print ("Tarea añadida")
     print("-------")
     print ("Selecciona una nueva opción.")
 
 def delete_task():
     while True: #bucle infinito hasta que no se especifique un break que lo haga salir
+        if tasks ==[]:
+            print("Ninguna tarea disponible para eliminar. volviendo al menú principal")
+            break
         try:
             to_delete = input("Selecciona el número de la tarea a eliminar y pulse Enter:")
-            tasks.pop(int(to_delete)-1)
+            try:
+                tasks.pop(int(to_delete)-1)
+            except ValueError:
+                print("Valor inválido. Por favor, seleccione un número válido")
+                continue
+            saving_tasks()
             print ("Tarea eliminada. Seleccione una nueva opción")
             break #para salir del bucle. solo sale si se selecciona una opcion valida.
         except IndexError:
             print("Valor inválido. Por favor, seleccione un número válido")
 
 if __name__ == "__main__":
-    tasks.append({"title": "Probar depuración", "status": "No Completada"})
-    see_task()
+    delete_task()
