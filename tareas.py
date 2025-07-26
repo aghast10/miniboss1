@@ -1,4 +1,5 @@
 from archivo import saving_tasks, tasks
+from datetime import datetime
 
 def printed_menu():
     print ("---MENU---")
@@ -33,8 +34,9 @@ def see_task():
         
     else:
         for i, task in enumerate(tasks):#enumerará todas las partes de la lista tasks
-            print (f"{i+1}. {task["title"]} -- {task["status"]}") #por cada par índice-valor, se imprime una cadena, donde aparecerá el índice y el valor que se esté recorreindo en esa iteración.
-        completed_task = input("selecciona el numero de la tarea a completar. si no, pulse enter: ")
+            print (f"{i+1}. {task["title"]} -- {task["description"]} -- A completar antes del {task["deadline"]} --({task["status"]})") #por cada par índice-valor, se imprime una cadena, donde aparecerá el índice y el valor que se esté recorriendo en esa iteración.
+        print("Selecciona el numero de la tarea a completar. Si no, pulsa enter: ")
+        completed_task = input()
         while completed_task != "":
             try: 
                 tasks[int(completed_task)-1]["status"] = "Completada"
@@ -42,13 +44,38 @@ def see_task():
                 print("Tarea completada")
                 break
             except (ValueError,IndexError): 
-                completed_task = input("seleccione una opción válida")
+                print("Selecciona una opción válida")
+                completed_task = input()
         print("-------")
+        print("Filtrar por Completadas:'c', Filtrar por No completadas: 'nc', Ordenar por fecha límite: 'o', Salir a menu: Enter")
+        filter_tasks = input()
+        if filter_tasks == "c":
+            for i, task in enumerate(tasks):
+                if task["status"] == "Completada":
+                    print (f"{i+1}. {task["title"]} -- {task["description"]} -- A completar antes del {task["deadline"]} --({task["status"]})")
+        if filter_tasks == "nc":
+            for i, task in enumerate(tasks):
+                if task["status"] == "No Completada":
+                    print (f"{i+1}. {task["title"]} -- {task["description"]} -- A completar antes del {task["deadline"]} --({task["status"]})")
+        if filter_tasks == "o":
+            ordered_tasks = sorted(tasks, key=lambda t: datetime.strptime(t["deadline"], "%d/%m/%Y"))
+            for i, task in enumerate(ordered_tasks):
+                print (f"{i+1}. {task["title"]} -- {task["description"]} -- A completar antes del {task["deadline"]} --({task["status"]})")
+
         print("Selecciona una nueva acción")
 
 def add_task():
-    new_task = input("Escribe una nueva tarea: ")
-    tasks.append({"title": new_task, "status": "No Completada"}) #añade bibliotecas a la lista tasks
+    task_title = input("Escribe una nueva tarea: ")
+    task_description = input("Escribe una descripción de la tarea: ")
+    while True:
+        date_input = input("Escribe la fecha limite para completar esta tarea, en formato dd-mm-aaaa (guiones incluidos): ")
+        try: 
+            task_deadline = datetime.strptime(date_input, "%d-%m-%Y").strftime("%d/%m/%Y")
+            break
+        except ValueError:
+            print ("Ingrese una fecha válida en formato dd-mm-aaaa (guiones incluidos)")
+
+    tasks.append({"title": task_title, "description": task_description, "deadline": task_deadline, "status": "No Completada"}) #añade bibliotecas a la lista tasks
     saving_tasks()
     print ("Tarea añadida")
     print("-------")
@@ -73,4 +100,8 @@ def delete_task():
             print("Valor inválido. Por favor, seleccione un número válido")
 
 if __name__ == "__main__":
-    delete_task()
+    tasks = [{"title": "correr", "description": "correr 100m", "deadline": "02/11/2025", "status": "Completada"}, {"title": "fumar mucho", "description": "fumar mucho mucho", "deadline": "02/03/2026", "status": "No Completada"},{"title": "gritar", "description": "gritR 100m", "deadline": "02/11/2027", "status": "Completada"}]
+    see_task()
+    while len(tasks) != 0:
+        tasks.pop(len(tasks)-1)
+    saving_tasks()
